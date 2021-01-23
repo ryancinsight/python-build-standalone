@@ -153,6 +153,8 @@ CLANG_DEPENDS := \
 $(OUTDIR)/clang-$(CLANG_VERSION)-$(HOST_PLATFORM).tar: $(CLANG_DEPENDS)
 	$(RUN_BUILD) --toolchain clang
 
+toolchain: $(OUTDIR)/clang-$(CLANG_VERSION)-$(HOST_PLATFORM).tar
+
 $(OUTDIR)/musl-$(MUSL_VERSION)-$(HOST_PLATFORM).tar: $(BASE_TOOLCHAIN_DEPENDS) $(HERE)/build-musl.sh
 	$(RUN_BUILD) --toolchain musl
 
