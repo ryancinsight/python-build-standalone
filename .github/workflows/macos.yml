@@ -166,3 +166,57 @@ jobs:
         with:
           name: dists-macos
           path: dist/*
+
+  cross:
+    strategy:
+      fail-fast: false
+      matrix:
+        triple:
+          - 'aarch64-apple-darwin'
+          - 'aarch64-apple-ios'
+        py:
+          - 'cpython-3.9'
+        optimizations:
+          - 'debug'
+          - 'noopt'
+    needs:
+      - pythonbuild
+      - toolchain
+    runs-on: 'macos-11.0'
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+
+      - name: Install Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: '3.9'
+
+      - name: Download pythonbuild
+        uses: actions/download-artifact@v2
+        with:
+          name: pythonbuild
+          path: build
+
+      - name: Download toolchain
+        uses: actions/download-artifact@v2
+        with:
+          name: toolchain
+          path: build
+
+      - name: Build
+        run: |
+          python3.9 ./build-macos.py --skip-toolchain --target-triple ${{ matrix.triple }} --python ${{ matrix.py }} --optimizations ${{ matrix.optimizations }}
+
+      # TODO enable
+      #- name: Validate Distribution
+      #  run: |
+      #    chmod +x build/pythonbuild
+      #    build/pythonbuild validate-distribution dist/*.tar.zst
+
+      - name: Upload Distributions
+        uses: actions/upload-artifact@v2
+        with:
+          name: dists-macos
+          path: dist/*
